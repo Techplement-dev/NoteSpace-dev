@@ -1,4 +1,53 @@
+/* font inter regular */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+/* font inter italic*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@1,14..32,100..900&display=swap');
+
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --bg: 255 255 255;
+    --fg: 15 23 42;
+    --accent: 37 99 235;
+}
+
+.dark {
+    --bg: 15 23 42;
+    --fg: 241 245 249;
+    --accent: 129 140 248;
+}
+
+/*regular font*/
+.inter-regular {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+/*italic font*/
+.inter-italic {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/*regular bold*/
+.inter-normal-bold {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+/*italic bold*/
+.inter-italic-bold {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: italic;
+}
