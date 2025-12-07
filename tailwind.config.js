@@ -11,7 +11,7 @@ module.exports = {
       colors: {
         bg: "rgb(var(--bg) / <alpha-value>)",
         fg: "rgb(var(--fg) / <alpha-value>)",
-        accent: "rgb(var(--accent) / <alpha-value)",
+        accent: "rgb(var(--accent) / <alpha-value>)",
       },
     },
   },
