@@ -47,19 +47,17 @@ const NoteSchema = new mongoose.Schema(
             type: String,
             default: 'default',
         },
+        logoText: {
+            type: String,
+            default: 'NoteSpace',
+            trim: true,
+            maxlength: [50, 'Logo text cannot be more than 50 characters'],
+        },
     },
     {
         timestamps: true,
     }
 );
-
-// Custom validation: Either title or content must be provided
-NoteSchema.pre('validate', function () {
-    if (!this.title && !this.content) {
-        this.invalidate('title', 'Either title or content must be provided');
-        this.invalidate('content', 'Either title or content must be provided');
-    }
-});
 
 // Indexes
 // Improve search performance
