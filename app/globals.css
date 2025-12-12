@@ -9,15 +9,37 @@
 @tailwind utilities;
 
 :root {
-    --bg: 255 255 255;
-    --fg: 15 23 42;
-    --accent: 37 99 235;
+  --bg: 255 255 255;
+  --fg: 15 23 42;
+  --accent: 37 99 235;
 }
 
 .dark {
-    --bg: 15 23 42;
-    --fg: 241 245 249;
-    --accent: 129 140 248;
+  --bg: 15 23 42;
+  --fg: 255 255 255;
+  /* Pure White Text */
+  --accent: 129 140 248;
+}
+
+/* Orange Glow Effect */
+.dark .orange-glow {
+  box-shadow: 0 0 25px rgba(255, 165, 0, 0.4), 0 0 10px rgba(255, 165, 0, 0.3);
+  border-color: rgba(255, 165, 0, 0.4);
+}
+
+.dark .icon-glow {
+  filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8));
+  color: white;
+}
+
+
+
+/* Hide Next.js Dev Indicators */
+[data-nextjs-toast],
+[data-nextjs-toast-errors-parent],
+[data-nextjs-dialog-overlay],
+nextjs-portal {
+  display: none !important;
 }
 
 /*regular font*/

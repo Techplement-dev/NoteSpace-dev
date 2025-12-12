@@ -6,13 +6,17 @@ export const metadata = {
     description: "A collaborative note-taking app",
 };
 
+import { ThemeProvider } from "./components/ThemeProvider";
+
 export default function RootLayout({
     children,
 }) {
     return (
         <html lang="en" suppressHydrationWarning>
             <body className="antialiased min-h-screen bg-bg text-fg transition-colors duration-300">
-                {children}
+                <ThemeProvider>
+                    {children}
+                </ThemeProvider>
             </body>
         </html>
     );

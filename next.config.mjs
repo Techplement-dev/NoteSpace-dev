@@ -13,6 +13,7 @@ const nextConfig = {
     }
     return config;
   },
+  devIndicators: false,
 };
 
 export default nextConfig;

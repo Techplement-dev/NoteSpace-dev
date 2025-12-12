@@ -42,7 +42,9 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
                 whileTap={!isDisabled ? { scale: 0.95 } : {}}
                 onClick={(e) => { if (!isDisabled) onClick(e); }}
                 disabled={isDisabled}
-                className={`p-2 rounded-full transition-colors text-fg ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                className={`p-2 rounded-full transition-colors text-fg ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    } ${theme === 'dark' ? 'icon-glow' : ''
+                    }`}
             >
                 <Icon size={20} />
             </motion.button>
@@ -62,111 +64,117 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
 
 
     return (
-        <nav className="fixed top-0 left-0 right-0 h-16 bg-bg/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
-            {/* Left: Editable Logo */}
+        <>
+            <motion.nav
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                className={`fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-4 md:px-8 transition-all duration-300 ${theme === 'dark' ? 'orange-glow' : ''
+                    }`}
+            >
+                {/* Left: Editable Logo */}
 
-            <div className="flex-shrink-0">
-                {isEditingLogo ? (
-                    <input
-                        type="text"
-                        value={logoText}
-                        onChange={(e) => onLogoChange && onLogoChange(e.target.value)}
-                        onBlur={() => setIsEditingLogo(false)}
-                        autoFocus
-                        onFocus={(e) => e.target.setSelectionRange(e.target.value.length, e.target.value.length)}
-                        className="text-lg font-bold px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-fg shadow-sm"
-                    />
-                ) : (
-                    <motion.h1
-                        whileHover={!isDisabled ? { scale: 1.02 } : {}}
-                        onClick={() => !isDisabled && setIsEditingLogo(true)}
-                        className={`text-2xl font-bold cursor-pointer text-fg select-none ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
-                    >
-                        {logoText}
-                    </motion.h1>
-                )}
-            </div>
-
-            {/* Desktop Toolbar */}
-            <div className="hidden md:flex items-center space-x-2">
-                <IconButton icon={Plus} tooltip="New note" onClick={handleNewNote} />
-                <IconButton icon={Lock} tooltip="Password protection" onClick={() => setIsPasswordModalOpen(true)} />
-                <IconButton icon={Link} tooltip="Change URL" onClick={() => setIsChangeUrlModalOpen(true)} />
-                <IconButton icon={Share2} tooltip="Share note" onClick={() => setIsShareModalOpen(true)} />
-                <Tooltip text="Delete note">
-                    <motion.button
-                        whileHover={!isNoteEmpty ? { scale: 1.1 } : {}}
-                        whileTap={!isNoteEmpty ? { scale: 0.95 } : {}}
-                        onClick={() => !isNoteEmpty && !isDisabled && setIsDeleteModalOpen(true)}
-                        disabled={isNoteEmpty || isDisabled}
-                        className={`p-2 rounded-full transition-colors ${isNoteEmpty || isDisabled
-                            ? 'opacity-40 cursor-not-allowed text-fg'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-fg cursor-pointer'
-                            }`}
-                    >
-                        <Trash2 size={20} />
-                    </motion.button>
-                </Tooltip>
-                <IconButton
-                    icon={theme === "dark" ? Sun : Moon}
-                    tooltip={`Toggle ${theme === "dark" ? "Light" : "Dark"}`}
-                    onClick={toggleTheme}
-                />
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="p-2 text-fg"
-                >
-                    {isMobileMenuOpen ? <X /> : <Menu />}
-                </motion.button>
-            </div>
-
-            {/* Mobile Drawer */}
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="absolute top-16 left-0 right-0 bg-bg border-b border-gray-200 dark:border-gray-800 p-4 md:hidden shadow-lg flex flex-col space-y-4"
-                    >
-                        <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={handleNewNote}>
-                            <span className="text-fg font-medium">New note</span>
-                            <Plus size={20} className="text-fg" />
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setIsPasswordModalOpen(true); setIsMobileMenuOpen(false); }}>
-                            <span className="text-fg font-medium">Password protection</span>
-                            <Lock size={20} className="text-fg" />
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setIsChangeUrlModalOpen(true); setIsMobileMenuOpen(false); }}>
-                            <span className="text-fg font-medium">Change URL</span>
-                            <Link size={20} className="text-fg" />
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => { setIsShareModalOpen(true); setIsMobileMenuOpen(false); }}>
-                            <span className="text-fg font-medium">Share note</span>
-                            <Share2 size={20} className="text-fg" />
-                        </div>
-                        <div
-                            className={`flex items-center justify-between p-2 rounded ${isNoteEmpty
-                                ? 'opacity-40 cursor-not-allowed'
-                                : 'hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
-                                }`}
-                            onClick={() => { if (!isNoteEmpty) { setIsDeleteModalOpen(true); setIsMobileMenuOpen(false); } }}
+                <div className="flex-shrink-0">
+                    {isEditingLogo ? (
+                        <input
+                            type="text"
+                            value={logoText}
+                            onChange={(e) => onLogoChange && onLogoChange(e.target.value)}
+                            onBlur={() => setIsEditingLogo(false)}
+                            autoFocus
+                            onFocus={(e) => e.target.setSelectionRange(e.target.value.length, e.target.value.length)}
+                            className="text-lg font-bold px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-fg shadow-sm"
+                        />
+                    ) : (
+                        <motion.h1
+                            whileHover={!isDisabled ? { scale: 1.02 } : {}}
+                            onClick={() => !isDisabled && setIsEditingLogo(true)}
+                            className={`text-2xl font-bold cursor-pointer text-fg select-none ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
                         >
-                            <span className="text-fg font-medium">Delete note</span>
-                            <Trash2 size={20} className="text-fg" />
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={toggleTheme}>
-                            <span className="text-fg font-medium">Theme ({theme})</span>
-                            {theme === "dark" ? <Sun size={20} className="text-fg" /> : <Moon size={20} className="text-fg" />}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            {logoText}
+                        </motion.h1>
+                    )}
+                </div>
+
+                {/* Desktop Toolbar */}
+                <div className="hidden md:flex items-center space-x-2">
+                    <IconButton icon={Plus} tooltip="New note" onClick={handleNewNote} />
+                    <IconButton icon={Lock} tooltip="Password protection" onClick={() => setIsPasswordModalOpen(true)} />
+                    <IconButton icon={Link} tooltip="Change URL" onClick={() => setIsChangeUrlModalOpen(true)} />
+                    <IconButton icon={Share2} tooltip="Share note" onClick={() => setIsShareModalOpen(true)} />
+                    <Tooltip text="Delete note">
+                        <motion.button
+                            whileHover={!isNoteEmpty ? { scale: 1.1 } : {}}
+                            whileTap={!isNoteEmpty ? { scale: 0.95 } : {}}
+                            onClick={() => !isNoteEmpty && !isDisabled && setIsDeleteModalOpen(true)}
+                            disabled={isNoteEmpty || isDisabled}
+                            className={`p-2 rounded-full transition-colors ${isNoteEmpty || isDisabled
+                                ? 'opacity-40 cursor-not-allowed text-fg'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-fg cursor-pointer'
+                                } ${theme === 'dark' ? 'icon-glow' : ''}`}
+                        >
+                            <Trash2 size={20} />
+                        </motion.button>
+                    </Tooltip>
+                    <IconButton
+                        icon={theme === "dark" ? Sun : Moon}
+                        tooltip={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                        onClick={toggleTheme}
+                    />
+                </div>
+
+                {/* Mobile Menu Button */}
+                <div className="md:hidden">
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="p-2 text-fg"
+                    >
+                        {isMobileMenuOpen ? <X /> : <Menu />}
+                    </motion.button>
+                </div>
+
+                {/* Mobile Drawer */}
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-4 md:hidden shadow-lg flex flex-col space-y-4"
+                        >
+                            <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={handleNewNote}>
+                                <span className="text-fg font-medium">New note</span>
+                                <Plus size={20} className="text-fg" />
+                            </div>
+
+                            <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => setIsPasswordModalOpen(true)}>
+                                <span className="text-fg font-medium">Password protection</span>
+                                <Lock size={20} className="text-fg" />
+                            </div>
+
+                            <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={() => setIsShareModalOpen(true)}>
+                                <span className="text-fg font-medium">Share</span>
+                                <Share2 size={20} className="text-fg" />
+                            </div>
+                            <div
+                                className={`flex items-center justify-between p-2 rounded ${isNoteEmpty
+                                    ? 'opacity-40 cursor-not-allowed'
+                                    : 'hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer text-red-500'
+                                    } ${theme === 'dark' ? 'icon-glow' : ''}`}
+                                onClick={() => { if (!isNoteEmpty) setIsDeleteModalOpen(true); }}
+                            >
+                                <span className="font-medium">Delete note</span>
+                                <Trash2 size={20} />
+                            </div>
+
+                            <div className="flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" onClick={toggleTheme}>
+                                <span className="text-fg font-medium">Switch to {theme === 'dark' ? 'Light' : 'Dark'} Mode</span>
+                                {theme === "dark" ? <Sun size={20} className="text-fg" /> : <Moon size={20} className="text-fg" />}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.nav>
 
             {/* Password Modal */}
             <PasswordModal
@@ -196,6 +204,6 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
                 onClose={() => setIsDeleteModalOpen(false)}
                 onDelete={onDelete}
             />
-        </nav>
+        </>
     );
 }
