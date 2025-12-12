@@ -13,7 +13,7 @@ const ShareModal = dynamic(() => import("./ShareModal"));
 const ChangeUrlModal = dynamic(() => import("./ChangeUrlModal"));
 const DeleteModal = dynamic(() => import("./DeleteModal"));
 
-export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmpty = true, onDelete }) {
+export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmpty = true, onDelete, isDisabled = false }) {
     const { theme, toggleTheme } = useTheme();
     const [isEditingLogo, setIsEditingLogo] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,10 +38,11 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
     const IconButton = ({ icon: Icon, onClick, tooltip }) => (
         <Tooltip text={tooltip}>
             <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onClick}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-fg"
+                whileHover={!isDisabled ? { scale: 1.1 } : {}}
+                whileTap={!isDisabled ? { scale: 0.95 } : {}}
+                onClick={(e) => { if (!isDisabled) onClick(e); }}
+                disabled={isDisabled}
+                className={`p-2 rounded-full transition-colors text-fg ${isDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
             >
                 <Icon size={20} />
             </motion.button>
@@ -80,9 +81,9 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
                     />
                 ) : (
                     <motion.h1
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => setIsEditingLogo(true)}
-                        className="text-2xl font-bold cursor-pointer text-fg select-none"
+                        whileHover={!isDisabled ? { scale: 1.02 } : {}}
+                        onClick={() => !isDisabled && setIsEditingLogo(true)}
+                        className={`text-2xl font-bold cursor-pointer text-fg select-none ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
                     >
                         {logoText}
                     </motion.h1>
@@ -99,9 +100,9 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
                     <motion.button
                         whileHover={!isNoteEmpty ? { scale: 1.1 } : {}}
                         whileTap={!isNoteEmpty ? { scale: 0.95 } : {}}
-                        onClick={() => !isNoteEmpty && setIsDeleteModalOpen(true)}
-                        disabled={isNoteEmpty}
-                        className={`p-2 rounded-full transition-colors ${isNoteEmpty
+                        onClick={() => !isNoteEmpty && !isDisabled && setIsDeleteModalOpen(true)}
+                        disabled={isNoteEmpty || isDisabled}
+                        className={`p-2 rounded-full transition-colors ${isNoteEmpty || isDisabled
                             ? 'opacity-40 cursor-not-allowed text-fg'
                             : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-fg cursor-pointer'
                             }`}

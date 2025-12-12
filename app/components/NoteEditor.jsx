@@ -16,12 +16,18 @@ function debounce(func, wait) {
     };
 }
 
-export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace", onContentChange, onTitleChange, onContentChange: onHomepageContentChange }) {
+export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace", onContentChange, onTitleChange, onContentChange: onHomepageContentChange, isDisabled = false }) {
     const textareaRef = useRef(null);
     const [value, setValue] = useState(initialData?.content || "");
     const [title, setTitle] = useState(initialData?.title || "");
     const [isLoading, setIsLoading] = useState(!initialData && !!noteId);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Unmount safety
+    const isMounted = useRef(true);
+    useEffect(() => {
+        return () => { isMounted.current = false; };
+    }, []);
 
     const adjustHeight = () => {
         const textarea = textareaRef.current;
@@ -59,7 +65,7 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
     // Save function
     const saveNote = async (newContent, newTitle, newLogo) => {
         if (!noteId) return;
-        setIsSaving(true);
+        if (isMounted.current) setIsSaving(true);
         try {
             await fetch(`/api/note/${noteId}`, {
                 method: 'PUT',
@@ -73,7 +79,7 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
         } catch (error) {
             console.error("Failed to save:", error);
         } finally {
-            setIsSaving(false);
+            if (isMounted.current) setIsSaving(false);
         }
     };
 
@@ -125,8 +131,9 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Note Title"
-                className="w-full bg-transparent text-3xl font-bold text-fg mb-4 focus:outline-none"
+                placeholder={isDisabled ? "Note Expired" : "Note Title"}
+                readOnly={isDisabled}
+                className={`w-full bg-transparent text-3xl font-bold text-fg mb-4 focus:outline-none ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
             />
 
             <div className="relative">
@@ -134,8 +141,9 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
                     ref={textareaRef}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
-                    placeholder="Start typing your note..."
-                    className="w-full bg-transparent text-lg md:text-xl text-fg focus:outline-none resize-none leading-relaxed overflow-hidden min-h-[50vh] placeholder:text-gray-400 dark:placeholder:text-gray-600 font-inter-regular"
+                    placeholder={isDisabled ? "The note has expired" : "Start typing your note..."}
+                    readOnly={isDisabled}
+                    className={`w-full bg-transparent text-lg md:text-xl text-fg focus:outline-none resize-none leading-relaxed overflow-hidden min-h-[50vh] placeholder:text-gray-400 dark:placeholder:text-gray-600 font-inter-regular ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
                     spellCheck="false"
                 />
                 {isSaving && (

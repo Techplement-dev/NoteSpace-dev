@@ -13,6 +13,8 @@ export default function NotePage({ params }) {
     const [currentTitle, setCurrentTitle] = useState("");
     const [currentContent, setCurrentContent] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [isDisabled, setIsDisabled] = useState(false);
+    const [updatedAt, setUpdatedAt] = useState(null);
 
     useEffect(() => {
         // Unwrap params
@@ -29,6 +31,33 @@ export default function NotePage({ params }) {
         const fetchNote = async () => {
             try {
                 const res = await fetch(`/api/note/${noteId}`);
+                if (res.status === 404) {
+                    // Note deleted (likely expired). Create a new note and redirect to it.
+                    try {
+                        const createRes = await fetch('/api/note', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title: '', content: '', logoText: 'NoteSpace' }),
+                        });
+
+                        const created = await createRes.json();
+                        if (created.success && created.data && created.data._id) {
+                            // Replace current URL with new slug
+                            router.replace(`/note/${created.data._id}`);
+                            return;
+                        } else {
+                            // If note creation failed, mark disabled to show expired UI message
+                            setIsDisabled(true);
+                            setIsLoading(false);
+                            return;
+                        }
+                    } catch (err) {
+                        console.error('Failed to create new note after expiry:', err);
+                        setIsDisabled(true);
+                        setIsLoading(false);
+                        return;
+                    }
+                }
                 const data = await res.json();
 
                 if (data.success) {
@@ -36,6 +65,7 @@ export default function NotePage({ params }) {
                     setLogoText(data.data.logoText || "NoteSpace");
                     setCurrentTitle(data.data.title || "");
                     setCurrentContent(data.data.content || "");
+                    setUpdatedAt(data.data.updatedAt);
                 }
             } catch (error) {
                 console.error("Failed to fetch note:", error);
@@ -46,6 +76,30 @@ export default function NotePage({ params }) {
 
         fetchNote();
     }, [noteId]);
+
+    // Check for expiry every minute
+    useEffect(() => {
+        if (!updatedAt || isDisabled) return;
+
+        const checkExpiry = () => {
+            const now = new Date();
+            const lastUpdate = new Date(updatedAt);
+            const diff = now - lastUpdate;
+            const isEmpty =
+                (!currentTitle || currentTitle.trim() === "") &&
+                (!currentContent || currentContent.trim() === "") &&
+                (logoText === "NoteSpace");
+
+            if (diff > 5 * 60 * 1000 && isEmpty) {
+                setIsDisabled(true);
+            }
+        };
+
+        const interval = setInterval(checkExpiry, 10000); // Check every 10 seconds
+        checkExpiry(); // Check immediately
+
+        return () => clearInterval(interval);
+    }, [updatedAt, currentTitle, currentContent, logoText, isDisabled]);
 
     // Check if note is empty (current values, not initial)
     const isNoteEmpty =
@@ -87,6 +141,7 @@ export default function NotePage({ params }) {
                 onLogoChange={setLogoText}
                 isNoteEmpty={isNoteEmpty}
                 onDelete={handleDelete}
+                isDisabled={isDisabled}
             />
             <NoteEditor
                 noteId={noteId}
@@ -94,6 +149,7 @@ export default function NotePage({ params }) {
                 logoText={logoText}
                 onTitleChange={setCurrentTitle}
                 onContentChange={setCurrentContent}
+                isDisabled={isDisabled}
             />
         </main>
     );
