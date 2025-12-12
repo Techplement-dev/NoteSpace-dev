@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/app/components/NavBar";
 import NoteEditor from "@/app/components/NoteEditor";
@@ -8,6 +8,7 @@ import NoteEditor from "@/app/components/NoteEditor";
 export default function NotePage({ params }) {
     const router = useRouter();
     const [noteId, setNoteId] = useState(null);
+    const [customUrl, setCustomUrl] = useState(null);
     const [initialData, setInitialData] = useState(null);
     const [logoText, setLogoText] = useState("NoteSpace");
     const [currentTitle, setCurrentTitle] = useState("");
@@ -15,6 +16,7 @@ export default function NotePage({ params }) {
     const [isLoading, setIsLoading] = useState(true);
     const [isDisabled, setIsDisabled] = useState(false);
     const [updatedAt, setUpdatedAt] = useState(null);
+    const isRenaming = useRef(false);
 
     useEffect(() => {
         // Unwrap params
@@ -30,8 +32,14 @@ export default function NotePage({ params }) {
         // Fetch note data
         const fetchNote = async () => {
             try {
+                // If we are in the middle of renaming, don't fetch or create new notes
+                if (isRenaming.current) return;
+
                 const res = await fetch(`/api/note/${noteId}`);
                 if (res.status === 404) {
+                    // Check again if renaming started while fetching
+                    if (isRenaming.current) return;
+
                     // Note deleted (likely expired). Create a new note and redirect to it.
                     try {
                         const createRes = await fetch('/api/note', {
@@ -41,9 +49,9 @@ export default function NotePage({ params }) {
                         });
 
                         const created = await createRes.json();
-                        if (created.success && created.data && created.data._id) {
-                            // Replace current URL with new slug
-                            router.replace(`/note/${created.data._id}`);
+                        if (created.success && created.data && created.data.customUrl) {
+                            // Replace current URL with new customUrl
+                            router.replace(`/note/${created.data.customUrl}`);
                             return;
                         } else {
                             // If note creation failed, mark disabled to show expired UI message
@@ -62,6 +70,7 @@ export default function NotePage({ params }) {
 
                 if (data.success) {
                     setInitialData(data.data);
+                    setCustomUrl(data.data.customUrl);
                     setLogoText(data.data.logoText || "NoteSpace");
                     setCurrentTitle(data.data.title || "");
                     setCurrentContent(data.data.content || "");
@@ -130,6 +139,14 @@ export default function NotePage({ params }) {
         }
     };
 
+    const handleUrlChange = (newUrl) => {
+        // Set renaming flag to prevent 404 handler from creating a new note
+        isRenaming.current = true;
+        // Update state to prevent fetch with old URL
+        setNoteId(newUrl);
+        setCustomUrl(newUrl);
+    };
+
     if (isLoading) {
         return <div className="p-8 text-center">Loading...</div>;
     }
@@ -142,6 +159,9 @@ export default function NotePage({ params }) {
                 isNoteEmpty={isNoteEmpty}
                 onDelete={handleDelete}
                 isDisabled={isDisabled}
+                noteId={noteId}
+                customUrl={customUrl}
+                onUrlChange={handleUrlChange}
             />
             <NoteEditor
                 noteId={noteId}

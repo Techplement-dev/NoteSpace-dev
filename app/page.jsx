@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "./components/NavBar";
 import NoteEditor from "./components/NoteEditor";
 
 export default function Home() {
     const router = useRouter();
+    const isCreating = useRef(false);
 
     useEffect(() => {
+        // Prevent double execution in Strict Mode and race conditions
+        if (isCreating.current) return;
+        isCreating.current = true;
+
         const createNote = async () => {
             try {
                 const res = await fetch('/api/note', {
@@ -24,10 +29,12 @@ export default function Home() {
                 const data = await res.json();
 
                 if (data.success) {
-                    router.push(`/note/${data.data._id}`);
+                    router.push(`/note/${data.data.customUrl}`);
                 }
             } catch (error) {
                 console.error('Error creating note:', error);
+                // Allow retrying if creation failed
+                isCreating.current = false;
             }
         };
 

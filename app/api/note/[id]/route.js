@@ -19,14 +19,8 @@ export async function GET(req, { params }) {
             );
         }
 
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { success: false, error: 'Invalid Note ID' },
-                { status: 400 }
-            );
-        }
-
-        const note = await Note.findOne({ _id: id, userId });
+        // Find note by customUrl
+        const note = await Note.findOne({ customUrl: id, userId });
 
         if (!note) {
             return NextResponse.json(
@@ -51,7 +45,7 @@ export async function PUT(req, { params }) {
         const body = await req.json();
         const cookieStore = await cookies();
         const userId = cookieStore.get('notespace_user_id')?.value;
-        const { ...updateData } = body; // removed userId from body destructuring since we get it from cookie
+        const { ...updateData } = body;
 
         if (!userId) {
             return NextResponse.json(
@@ -60,15 +54,34 @@ export async function PUT(req, { params }) {
             );
         }
 
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { success: false, error: 'Invalid Note ID' },
-                { status: 400 }
-            );
+        // If updating customUrl, check for duplicates
+        if (updateData.customUrl) {
+            // First, find the current note to get its _id
+            const currentNote = await Note.findOne({ customUrl: id, userId });
+
+            if (!currentNote) {
+                return NextResponse.json(
+                    { success: false, error: 'Note not found' },
+                    { status: 404 }
+                );
+            }
+
+            // Check if the new customUrl is already taken by ANY note (excluding current note by _id)
+            const duplicateNote = await Note.findOne({
+                customUrl: updateData.customUrl,
+                _id: { $ne: currentNote._id } // Exclude current note by _id
+            });
+
+            if (duplicateNote) {
+                return NextResponse.json(
+                    { success: false, error: 'Already Taken' },
+                    { status: 409 }
+                );
+            }
         }
 
         const note = await Note.findOneAndUpdate(
-            { _id: id, userId },
+            { customUrl: id, userId },
             updateData,
             { new: true, runValidators: true }
         );
@@ -87,6 +100,12 @@ export async function PUT(req, { params }) {
             return NextResponse.json(
                 { success: false, error: messages.join(', ') },
                 { status: 400 }
+            );
+        }
+        if (error.code === 11000) {
+            return NextResponse.json(
+                { success: false, error: 'Already Taken' },
+                { status: 409 }
             );
         }
         return NextResponse.json(
@@ -110,14 +129,7 @@ export async function DELETE(req, { params }) {
             );
         }
 
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { success: false, error: 'Invalid Note ID' },
-                { status: 400 }
-            );
-        }
-
-        const deletedNote = await Note.findOneAndDelete({ _id: id, userId });
+        const deletedNote = await Note.findOneAndDelete({ customUrl: id, userId });
 
         if (!deletedNote) {
             return NextResponse.json(

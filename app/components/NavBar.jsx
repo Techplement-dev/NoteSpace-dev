@@ -13,7 +13,7 @@ const ShareModal = dynamic(() => import("./ShareModal"));
 const ChangeUrlModal = dynamic(() => import("./ChangeUrlModal"));
 const DeleteModal = dynamic(() => import("./DeleteModal"));
 
-export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmpty = true, onDelete, isDisabled = false }) {
+export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmpty = true, onDelete, isDisabled = false, noteId, customUrl, onUrlChange }) {
     const { theme, toggleTheme } = useTheme();
     const [isEditingLogo, setIsEditingLogo] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -59,10 +59,7 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
         window.open('/', '_blank');
     };
 
-    const handleSaveUrl = (newUrl) => {
-        console.log("New URL:", newUrl);
-        // Implement logic to save new URL
-    };
+
 
     return (
         <nav className="fixed top-0 left-0 right-0 h-16 bg-bg/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-4 md:px-8 transition-colors duration-300">
@@ -188,7 +185,9 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
             <ChangeUrlModal
                 isOpen={isChangeUrlModalOpen}
                 onClose={() => setIsChangeUrlModalOpen(false)}
-                onSave={handleSaveUrl}
+                noteId={noteId}
+                currentCustomUrl={customUrl}
+                onUrlChange={onUrlChange}
             />
 
             {/* Delete Modal */}

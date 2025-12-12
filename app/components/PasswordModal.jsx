@@ -86,7 +86,7 @@ export default function PasswordModal({ isOpen, onClose, onAdd }) {
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => { onAdd(password); onClose(); }}
                                 disabled={!password}
-                                className="px-8 py-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-blue-500/30 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-8 py-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-blue-500/30 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Add
                             </motion.button>
