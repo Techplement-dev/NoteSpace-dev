@@ -243,6 +243,7 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
             <ShareModal
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
+                shareUrl="https://notespace.pw/notes/xyz123"
             />
 
             {/* Change URL Modal */}
