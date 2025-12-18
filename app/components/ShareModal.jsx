@@ -57,9 +57,7 @@ export default function ShareModal({ isOpen, onClose, shareUrl = "" }) {
         };
     }, [isOpen, onClose]);
 
-    const openShare = (url) => {
-        window.open(url, "_blank", "noopener,noreferrer");
-    };
+
 
     const shareOptions = [
         {
