@@ -31,8 +31,15 @@ const Tooltip = ({ content, children }) => (
     </div>
 );
 
-export default function ShareModal({ isOpen, onClose }) {
+export default function ShareModal({ isOpen, onClose, shareUrl = "" }) {
     const modalRef = useRef(null);
+
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedText = encodeURIComponent("Check out this note on NoteSpace!");
+
+    const openShare = (url) => {
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -51,13 +58,57 @@ export default function ShareModal({ isOpen, onClose }) {
     }, [isOpen, onClose]);
 
     const shareOptions = [
-        { name: "Copy Link", icon: Copy, color: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300", action: () => console.log("Copy Link") },
-        { name: "X", icon: XIcon, color: "bg-black text-white", action: () => console.log("X") },
-        { name: "Facebook", icon: FaFacebook, color: "bg-blue-100 text-blue-600", action: () => console.log("Facebook") },
-        { name: "LinkedIn", icon: FaLinkedin, color: "bg-indigo-100 text-indigo-600", action: () => console.log("LinkedIn") },
-        { name: "Instagram", icon: FaInstagram, color: "bg-pink-100 text-pink-600", action: () => console.log("Instagram") },
-        { name: "WhatsApp", icon: FaWhatsapp, color: "bg-green-100 text-green-600", action: () => console.log("WhatsApp") },
-        { name: "Email", icon: SiGmail, color: "bg-red-100 text-red-600", action: () => console.log("Email") },
+        {
+            name: "Copy Link",
+            icon: Copy,
+            color: "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300",
+            action: () => navigator.clipboard.writeText(shareUrl),
+        },
+        {
+            name: "X",
+            icon: XIcon,
+            color: "bg-black text-white",
+            action: () =>
+                openShare(`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`),
+        },
+        {
+            name: "Facebook",
+            icon: FaFacebook,
+            color: "bg-blue-100 text-blue-600",
+            action: () =>
+                openShare(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`),
+        },
+        {
+            name: "LinkedIn",
+            icon: FaLinkedin,
+            color: "bg-indigo-100 text-indigo-600",
+            action: () =>
+                openShare(
+                    `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
+                ),
+        },
+        {
+            name: "WhatsApp",
+            icon: FaWhatsapp,
+            color: "bg-green-100 text-green-600",
+            action: () =>
+                openShare(`https://wa.me/?text=${encodedText}%20${encodedUrl}`),
+        },
+        {
+            name: "Email",
+            icon: SiGmail,
+            color: "bg-red-100 text-red-600",
+            action: () =>
+                openShare(
+                    `mailto:?subject=Shared Note&body=${encodedText}%0A${encodedUrl}`
+                ),
+        },
+        {
+            name: "Instagram",
+            icon: FaInstagram,
+            color: "bg-pink-100 text-pink-600",
+            action: () => openShare("https://www.instagram.com/"),
+        },
     ];
 
     return (
@@ -105,13 +156,19 @@ export default function ShareModal({ isOpen, onClose }) {
                                 ))}
                             </div>
 
-                            <div className="w-full p-2 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-between border border-gray-200 dark:border-gray-700">
-                                <span className="text-xs text-gray-500 truncate px-2">https://notespace.pw/notes/xyz...</span>
+                            <div className="w-full p-2 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-between border">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={shareUrl}
+                                    onClick={(e) => e.target.select()}
+                                    className="w-full bg-transparent border-none text-xs text-gray-500 focus:ring-0 px-2 outline-none"
+                                />
                                 <Tooltip content="Copy">
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        onClick={() => navigator.clipboard.writeText("https://notespace.pw/notes/xyz...")}
+                                        onClick={() => navigator.clipboard.writeText(shareUrl)}
                                         className="p-2 text-accent hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors"
                                     >
                                         <Copy size={16} />

@@ -90,8 +90,8 @@ const NoteSchema = new mongoose.Schema(
 // Indexes
 // Improve search performance
 NoteSchema.index({ title: 'text', content: 'text' });
-// Unique index for customUrl routing
-NoteSchema.index({ customUrl: 1 }, { unique: true });
+// Unique index for customUrl routing - handled by schema definition
+// NoteSchema.index({ customUrl: 1 }, { unique: true });
 // Automatic deletion of empty notes after 5 minutes
 NoteSchema.index(
     { updatedAt: 1 },

@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import { cookies } from 'next/headers';
 
 export async function GET(req, { params }) {
-    console.log('GET /api/note/[id] route accessed');
     try {
         await dbConnect();
         const { id } = await params;

@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import LinkIcon from "lucide-react/dist/esm/icons/link"; // Workaround if simple import fails, but simpler to use generic 'Link' if exported
-import { Link, Cloud, Lock, Share2, Sun, Moon, Menu, X, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, Lock, Share2, Sun, Moon, Menu, X, Plus, Trash2 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { motion, AnimatePresence } from "framer-motion";
-import clsx from "clsx";
 import dynamic from "next/dynamic";
 
 const Tooltip = ({ text, children }) => (
@@ -50,9 +48,13 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
     const [isPasswordStatusModalOpen, setIsPasswordStatusModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [isChangeUrlModalOpen, setIsChangeUrlModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [origin, setOrigin] = useState('');
 
-    
+    useEffect(() => {
+        setOrigin(window.location.origin);
+    }, []);
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const handleAddPassword = async (password) => {
         if (!password || password.length > 8) return;
@@ -243,6 +245,7 @@ export default function NavBar({ logoText = "NoteSpace", onLogoChange, isNoteEmp
             <ShareModal
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
+                shareUrl={`${origin}/note/${customUrl || noteId}`}
             />
 
             {/* Change URL Modal */}

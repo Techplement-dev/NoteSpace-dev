@@ -3,18 +3,7 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 
-// Simple debounce utility
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+import { debounce } from "../../lib/utils";
 
 export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace", onContentChange, onTitleChange, onContentChange: onHomepageContentChange, isDisabled = false }) {
     const textareaRef = useRef(null);
