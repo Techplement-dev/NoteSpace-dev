@@ -108,6 +108,26 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
         return <div className="p-8 text-center text-gray-500">Loading...</div>;
     }
 
+    if (isDisabled) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-4xl mx-auto mt-24 p-8 text-center"
+            >
+                <div className="p-6 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/20 inline-block">
+                    <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">
+                        The note has been Expired.
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        To create a new note refresh the current Web page ( <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1 rounded">Ctrl + R</span> ).
+                    </p>
+                </div>
+            </motion.div>
+        );
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -120,9 +140,8 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={isDisabled ? "Note Expired" : "Note Title"}
-                readOnly={isDisabled}
-                className={`w-full bg-transparent text-3xl font-bold text-fg mb-4 focus:outline-none ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
+                placeholder="Note Title"
+                className="w-full bg-transparent text-3xl font-bold text-fg mb-4 focus:outline-none"
             />
 
             <div className="relative">
@@ -130,9 +149,8 @@ export default function NoteEditor({ noteId, initialData, logoText = "NoteSpace"
                     ref={textareaRef}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
-                    placeholder={isDisabled ? "The note has expired" : "Start typing your note..."}
-                    readOnly={isDisabled}
-                    className={`w-full bg-transparent text-lg md:text-xl text-fg focus:outline-none resize-none leading-relaxed overflow-hidden min-h-[50vh] placeholder:text-gray-400 dark:placeholder:text-gray-600 font-inter-regular ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
+                    placeholder="Start typing your note..."
+                    className="w-full bg-transparent text-lg md:text-xl text-fg focus:outline-none resize-none leading-relaxed overflow-hidden min-h-[50vh] placeholder:text-gray-400 dark:placeholder:text-gray-600 font-inter-regular"
                     spellCheck="false"
                 />
                 {isSaving && (

@@ -59,15 +59,10 @@ export default function ChangeUrlModal({ isOpen, onClose, noteId, currentCustomU
             return false;
         }
 
-        const hasUppercase = /[A-Z]/.test(value);
-        const hasLowercase = /[a-z]/.test(value);
-        const hasNumber = /[0-9]/.test(value);
-        // Modified regex to only allow safe special chars: ! @ $ ^ * _ -
-        const hasSpecial = /[!@$^*_\-]/.test(value);
-        // Strict alphanumeric + safe special chars check
+        // Allowed: alphanumeric + ! @ $ ^ * _ -
         const isAlphanumericSpecial = /^[a-zA-Z0-9!@$^*_\-]+$/.test(value);
 
-        return hasUppercase && hasLowercase && hasNumber && hasSpecial && isAlphanumericSpecial;
+        return isAlphanumericSpecial;
     };
 
     const handleSave = async () => {
@@ -147,7 +142,7 @@ export default function ChangeUrlModal({ isOpen, onClose, noteId, currentCustomU
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="text-accent mt-0.5">•</span>
-                                        <span>Must include: 1 uppercase, 1 lowercase, 1 number, 1 special char (! @ $ ^ * _ -)</span>
+                                        <span>In case of special characters, use only (! @ $ ^ * _ -)</span>
                                     </li>
 
                                 </ul>

@@ -29,15 +29,10 @@ function generateCustomUrl() {
 function validateCustomUrl(value) {
     if (!value) return false;
 
-    const hasUppercase = /[A-Z]/.test(value);
-    const hasLowercase = /[a-z]/.test(value);
-    const hasNumber = /[0-9]/.test(value);
-    // Modified regex to only allow safe special chars: ! @ $ ^ * _ -
-    const hasSpecial = /[!@$^*_\-]/.test(value);
-    // Strict alphanumeric + safe special chars check
+    // Allowed: alphanumeric + ! @ $ ^ * _ -
     const isAlphanumericSpecial = /^[a-zA-Z0-9!@$^*_\-]+$/.test(value);
 
-    return hasUppercase && hasLowercase && hasNumber && hasSpecial && isAlphanumericSpecial;
+    return isAlphanumericSpecial;
 }
 
 const NoteSchema = new mongoose.Schema(
@@ -65,7 +60,7 @@ const NoteSchema = new mongoose.Schema(
             maxlength: [20, 'Custom URL cannot be more than 20 characters'],
             validate: {
                 validator: validateCustomUrl,
-                message: 'Custom URL must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+                message: 'Custom URL can only contain letters, numbers and (! @ $ ^ * _ -)'
             },
             default: generateCustomUrl,
         },
